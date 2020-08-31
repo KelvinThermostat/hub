@@ -1,0 +1,29 @@
+version: "3.3"
+services:
+  influxdb:
+    container_name: influxdb
+    image: influxdb:latest
+    ports:
+      - "8086:8086"
+    volumes: 
+      - ~/Docker/kelvin/influxdb:/var/lib/influxdb
+    restart: unless-stopped
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:latest
+    depends_on:
+      - influxdb
+    ports: 
+      - "3000:3000"
+    # volumes: 
+    #   - ~/Docker/kelvin/grafana:/var/lib/grafana
+    restart: unless-stopped
+  kelvin:
+    build:
+      context: ./src  
+    container_name: kelvin-hub
+    depends_on: 
+      - influxdb
+    environment:
+      TZ: 'Europe/Dublin'
+    restart: unless-stopped
