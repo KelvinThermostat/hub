@@ -1,53 +1,24 @@
-import threading
-import time
-from influxdb import InfluxDBClient
-from requests import get
+import logging
 
-def background_calculation():
-    client = InfluxDBClient('influxdb', database='kelvin')
-    client.create_database('kelvin')
+from dotenv import load_dotenv
 
-    while True:
-        print('Reading...')
-        current_temperature, target_temperature, humidity  = read_sensor()
+from dashboard import DashboardService
+from temperature import TemperatureService
 
-        json_body = [
-            {
-                "measurement": "current_temperature",
-                "fields": {
-                    "value": current_temperature
-                }
-            },
-            {
-                "measurement": "target_temperature",
-                "fields": {
-                    "value": target_temperature
-                }
-            },
-            {
-                "measurement": "humidity",
-                "fields": {
-                    "value": humidity
-                }
-            },
-        ]
+logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
 
-        client.write_points(json_body)
-
-        time.sleep(120)
+load_dotenv()
 
 
-def read_sensor():
-    response = get('http://192.168.68.201/api/status')
+def load_services():
+    temperature = TemperatureService.getInstance()
+    dashboard = DashboardService()
 
-    reading = response.json()
+    temperature.target_temperature = 19.6
 
-    return reading['actual_temperature'], reading['target_temperature'], reading['humidity']
-
-def main():
-    thread = threading.Thread(target=background_calculation)
-    thread.start()
+    temperature.start()
+    dashboard.start()
 
 
 if __name__ == '__main__':
-    main()
+    load_services()

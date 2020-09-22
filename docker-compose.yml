@@ -15,8 +15,6 @@ services:
       - influxdb
     ports: 
       - "3000:3000"
-    # volumes: 
-    #   - ~/Docker/kelvin/grafana:/var/lib/grafana
     restart: unless-stopped
   kelvin:
     build:
@@ -27,3 +25,8 @@ services:
     environment:
       TZ: 'Europe/Dublin'
     restart: unless-stopped
+    environment: 
+      - influxdb_host=influxdb
+      - influxdb_database=kelvin
+      - sensor_url=http://192.168.68.201
+      - heater_switch_url=http://192.168.68.200
