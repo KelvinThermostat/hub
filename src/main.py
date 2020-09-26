@@ -15,8 +15,6 @@ def load_services():
     temperature = TemperatureService.getInstance()
     dashboard = DashboardService()
 
-    temperature.target_temperature = 19.6
-
     temperature.start()
     dashboard.start()
 
