@@ -22,11 +22,12 @@ services:
     container_name: kelvin-hub
     depends_on: 
       - influxdb
-    environment:
-      TZ: 'Europe/Dublin'
+    ports:
+      - "5000:5000"
     restart: unless-stopped
-    environment: 
+    environment:
+      - TZ='Europe/Dublin'
       - influxdb_host=influxdb
-      - influxdb_database=kelvin
+      - influxdb_database=kelvin_dev
       - sensor_url=http://192.168.68.201
       - heater_switch_url=http://192.168.68.200
