@@ -17,11 +17,11 @@ class TemperatureService:
         self.actual_temperature = 0.0
         self.target_temperature = 0.0
         self.humidity = 0
+        self.boosting = False
+        self.heating_end = None
+        self.heating = False
+        self.heating_started = None
 
-        self._boosting = False
-        self._heating_end = None
-        self._heating = False
-        self._heating_started = None
         self._sensor_url = environ.get('sensor_url')
         self._heater = HeaterService()
 
@@ -33,15 +33,23 @@ class TemperatureService:
         return TemperatureService._instance
 
     def boost(self, minutes):
-        if self._boosting:
-            raise Exception('Boosting in progress.')
+        if self.boosting:
+            return
 
-        self._boosting = True
+        self.boosting = True
         self._heat(minutes)
 
     def start(self):
         thread = Thread(target=self._worker)
         thread.start()
+
+    def stop_heating(self):
+        info('Stopping heating.')
+        self._heater.stop()
+        self.boosting = False
+        self.heating = False
+        self.heating_end = None
+        self.heating_started = None
 
     def _check_heating_start(self):
         if self.actual_temperature <= self.target_temperature:
@@ -49,20 +57,14 @@ class TemperatureService:
 
     def _check_heating_stop(self):
         if self.actual_temperature > self.target_temperature \
-            and datetime.now() > self._heating_end:
-
-            info('Stopping heating.')
-            self._heater.stop()
-            self._boosting = False
-            self._heating = False
-            self._heating_end = None
-            self._heating_started = None
+            and datetime.now() > self.heating_end:
+            self.stop_heating()
 
     def _heat(self, minutes):
         self._heater.start()
-        self._heating = True
-        self._heating_end = datetime.now() + timedelta(minutes=minutes)
-        self._heating_started = datetime.now()
+        self.heating = True
+        self.heating_end = datetime.now() + timedelta(minutes=minutes)
+        self.heating_started = datetime.now()
 
         info('Starting heating until {self._heating_end}')
 
@@ -84,7 +86,7 @@ class TemperatureService:
                     f'Checking temperature. Current: {self.actual_temperature}'
                 )
 
-                if self._heating:
+                if self.heating:
                     self._check_heating_stop()
                 else:
                     self._check_heating_start()
