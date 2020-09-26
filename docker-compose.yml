@@ -28,6 +28,6 @@ services:
     environment:
       - TZ='Europe/Dublin'
       - influxdb_host=influxdb
-      - influxdb_database=kelvin_dev
+      - influxdb_database=kelvin
       - sensor_url=http://192.168.68.201
       - heater_switch_url=http://192.168.68.200
