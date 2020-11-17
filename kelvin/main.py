@@ -1,33 +1,39 @@
-from flask import Flask, jsonify
+from fastapi import FastAPI
 
-from temperature import TemperatureService
+from .service.temperature import TemperatureService
+from .worker import start_workers, stop_workers
 
-app = Flask(__name__)
 temperature_service = TemperatureService.getInstance()
 
-@app.route('/')
-def index():
-    return app.send_static_file('index.html')
+app = FastAPI()
 
-@app.route('/api/heating/boost/<int:minutes>', methods=['GET'])
+
+@app.on_event('startup')
+def startup():
+    start_workers()
+
+
+@app.on_event('shutdown')
+def shutdown():
+    stop_workers()
+
+
+@app.get('/api/heating/boost/<int:minutes>', status_code=201)
 def heating_boost(minutes):
     temperature_service.boost(minutes)
 
-    return '', 201
 
-@app.route('/api/heating/stop', methods=['GET'])
+@app.get('/api/heating/stop', status_code=201)
 def heating_stop():
     temperature_service.stop_heating()
 
-    return '', 201
 
-@app.route('/api/heating/target/<float:temperature>', methods=['GET'])
+@app.get('/api/heating/target/<float:temperature>', status_code=201)
 def set_temperature(temperature):
     temperature_service.target_temperature = temperature
 
-    return '', 201
 
-@app.route('/api/status', methods=['GET'])
+@app.get('/api/status')
 def status():
     response = {
         'actual_temperature': temperature_service.actual_temperature,
@@ -38,4 +44,4 @@ def status():
         'target_temperature': temperature_service.target_temperature,
     }
 
-    return jsonify(response)
+    return response

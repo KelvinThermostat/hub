@@ -5,7 +5,7 @@ from requests import get
 
 class HeaterService:
     def __init__(self):
-        self.heater_switch_url = environ.get('heater_switch_url')
+        self.heater_switch_url = environ['heater_switch_url']
 
     def start(self):
         self._switch('on')

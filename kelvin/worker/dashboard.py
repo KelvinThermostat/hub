@@ -1,43 +1,40 @@
-from logging import exception, info
+from logging import exception
 from os import environ
-from threading import Thread
-from time import sleep
+from threading import Event, Thread
 
 from influxdb import InfluxDBClient
-from requests import get
-
-from temperature import TemperatureService
+from kelvin.service.temperature import TemperatureService
 
 
-class DashboardService:
-    def __init__(self):
-        host = environ.get('influxdb_host')
-        database = environ.get('influxdb_database')
-
-        self.client = InfluxDBClient(host, database=database)
-        self.client.create_database(database)
+class DashboardWorker():
+    def __init__(self, shuttingdown_event: Event):
+        self.shuttingdown_event = shuttingdown_event
         self.temperature_service = TemperatureService.getInstance()
+
+        database = environ['influxdb_database']
+        self.client = InfluxDBClient(environ['influxdb_host'], database=database)
+        self.client.create_database(database)
 
     def start(self):
         thread = Thread(target=self._worker)
         thread.start()
 
     def _worker(self):
-        sleep(2)
-
-        while True:
+        while not self.shuttingdown_event.is_set():
             try:
                 json_body = [
                     {
                         "measurement": "current_temperature",
                         "fields": {
-                            "value": self.temperature_service.actual_temperature
+                            "value":
+                            self.temperature_service.actual_temperature
                         }
                     },
                     {
                         "measurement": "target_temperature",
                         "fields": {
-                            "value": self.temperature_service.target_temperature
+                            "value":
+                            self.temperature_service.target_temperature
                         }
                     },
                     {
@@ -51,7 +48,7 @@ class DashboardService:
                 self.client.write_points(json_body)
 
             except:
-                exception('Error on DashboardService._worker.')
+                exception('Error on DashboardWorker._worker.')
 
             finally:
-                sleep(120)
+                self.shuttingdown_event.wait(120)
