@@ -2,3 +2,6 @@ __pycache__/
 .env
 .venv/
 .vscode/
+.gitignore
+docker-compose.yml
+Dockerfile

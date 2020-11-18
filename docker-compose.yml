@@ -17,9 +17,8 @@ services:
       - "3000:3000"
     restart: unless-stopped
   kelvin:
-    build:
-      context: ./src  
     container_name: kelvin-hub
+    image: kelvinthermostat/hub:latest
     depends_on: 
       - influxdb
     ports:

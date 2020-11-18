@@ -5,4 +5,4 @@ WORKDIR /home/kelvin
 RUN pip install -r requirements.txt
 EXPOSE 5000
 
-ENTRYPOINT [ "python", "main.py" ]
+ENTRYPOINT [ "uvicorn", "kelvin.main:app" ]
