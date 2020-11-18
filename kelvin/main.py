@@ -18,8 +18,8 @@ def shutdown():
     stop_workers()
 
 
-@app.get('/api/heating/boost/<int:minutes>', status_code=201)
-def heating_boost(minutes):
+@app.get('/api/heating/boost/{minutes}', status_code=201)
+def heating_boost(minutes: int):
     temperature_service.boost(minutes)
 
 
@@ -28,8 +28,8 @@ def heating_stop():
     temperature_service.stop_heating()
 
 
-@app.get('/api/heating/target/<float:temperature>', status_code=201)
-def set_temperature(temperature):
+@app.get('/api/heating/target/{temperature}', status_code=201)
+def set_temperature(temperature: float):
     temperature_service.target_temperature = temperature
 
 
