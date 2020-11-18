@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 from logging import info
-from os import environ
 
 from .heater import HeaterService
 
+HEATING_INTERVAL = 45
 
 class TemperatureService:
     _instance = None
@@ -49,7 +49,7 @@ class TemperatureService:
 
     def _check_heating_start(self):
         if self.actual_temperature <= self.target_temperature:
-            self._heat(30)
+            self._heat(HEATING_INTERVAL)
 
     def _check_heating_stop(self):
         if self.actual_temperature > self.target_temperature \
