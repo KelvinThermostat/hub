@@ -12,7 +12,8 @@ class DashboardWorker():
         self.temperature_service = TemperatureService.getInstance()
 
         database = environ['influxdb_database']
-        self.client = InfluxDBClient(environ['influxdb_host'], database=database)
+        self.client = InfluxDBClient(environ['influxdb_host'],
+                                     database=database)
         self.client.create_database(database)
 
     def start(self):
@@ -43,6 +44,12 @@ class DashboardWorker():
                             "value": self.temperature_service.humidity
                         }
                     },
+                    {
+                        "measurement": "heating",
+                        "fields": {
+                            "value": self.temperature_service.heating
+                        }
+                    }
                 ]
 
                 self.client.write_points(json_body)
