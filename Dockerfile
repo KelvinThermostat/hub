@@ -1,7 +1,7 @@
 FROM python:3.8
 
-COPY . /home/kelvin
-WORKDIR /home/kelvin
+COPY . /app/kelvin
+WORKDIR /app/kelvin
 RUN pip install -r requirements.txt
 EXPOSE 5000
 

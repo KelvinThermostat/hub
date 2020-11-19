@@ -26,10 +26,9 @@ services:
     ports:
       - "5000:5000"
     volumes: 
-      - kelvin-hub:/home/kelvin/data
+      - kelvin-hub:/app/kelvin/data
     restart: unless-stopped
     environment:
-      - TZ='Europe/Dublin'
       - influxdb_host=influxdb
       - influxdb_database=kelvin
       - sensor_url=http://192.168.68.201
