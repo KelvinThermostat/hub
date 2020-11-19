@@ -1,21 +1,31 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 
+from .database import create
 from .service.temperature import TemperatureService
 from .worker import start_workers, stop_workers
 
-temperature_service = TemperatureService.getInstance()
+temperature_service = TemperatureService.get_instance()
 
 app = FastAPI()
 
 
 @app.on_event('startup')
 def startup():
+    create()
     start_workers()
 
 
 @app.on_event('shutdown')
 def shutdown():
     stop_workers()
+
+
+@app.middleware('http')
+async def add_process_time_header(request: Request, call_next):
+    response = await call_next(request)
+    response.headers['Cache-Control'] = 'no-store'
+
+    return response
 
 
 @app.get('/api/heating/boost/{minutes}', status_code=201)
@@ -30,7 +40,7 @@ def heating_stop():
 
 @app.get('/api/heating/target/{temperature}', status_code=201)
 def set_temperature(temperature: float):
-    temperature_service.target_temperature = temperature
+    temperature_service.set_target_temperature(temperature)
 
 
 @app.get('/api/status')
@@ -41,7 +51,7 @@ def status():
         'heating': temperature_service.heating,
         'heating_end': temperature_service.heating_end,
         'heating_started': temperature_service.heating_started,
-        'target_temperature': temperature_service.target_temperature,
+        'target_temperature': temperature_service.get_target_temperature(),
     }
 
     return response

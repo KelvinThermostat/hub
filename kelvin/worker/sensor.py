@@ -9,7 +9,7 @@ from requests import get
 class SensorWorker:
     def __init__(self, shuttingdown_event: Event):
         self.shuttingdown_event = shuttingdown_event
-        self.temperature_service = TemperatureService.getInstance()
+        self.temperature_service = TemperatureService.get_instance()
         self._sensor_url = environ['sensor_url']
 
     def start(self):

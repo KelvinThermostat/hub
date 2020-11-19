@@ -9,7 +9,7 @@ from kelvin.service.temperature import TemperatureService
 class DashboardWorker():
     def __init__(self, shuttingdown_event: Event):
         self.shuttingdown_event = shuttingdown_event
-        self.temperature_service = TemperatureService.getInstance()
+        self.temperature_service = TemperatureService.get_instance()
 
         database = environ['influxdb_database']
         self.client = InfluxDBClient(environ['influxdb_host'],
@@ -38,7 +38,7 @@ class DashboardWorker():
                         "measurement": "target_temperature",
                         "fields": {
                             "value":
-                            self.temperature_service.target_temperature
+                            self.temperature_service.get_target_temperature()
                         }
                     },
                     {
