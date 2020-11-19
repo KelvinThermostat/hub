@@ -21,6 +21,9 @@ class DashboardWorker():
         thread.start()
 
     def _worker(self):
+        # Delay to only start after other workers
+        self.shuttingdown_event.wait(2)
+
         while not self.shuttingdown_event.is_set():
             try:
                 json_body = [
