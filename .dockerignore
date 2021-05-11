@@ -5,3 +5,4 @@ __pycache__/
 .gitignore
 docker-compose.yml
 Dockerfile
+kelvin/data/kelvin.db
