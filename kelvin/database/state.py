@@ -31,6 +31,7 @@ class State(Base):
 
         if not item:
             item = State()
+            item.key = key
 
         item.value = value
 

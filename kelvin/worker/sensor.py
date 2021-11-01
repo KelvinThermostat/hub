@@ -13,6 +13,9 @@ class SensorWorker:
         self._sensor_url = environ['sensor_url']
 
     def start(self):
+        # Ensure the heating is off when monitor starts
+        self.temperature_service.stop_heating()
+
         thread = Thread(target=self._worker)
         thread.start()
 
