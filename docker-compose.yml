@@ -2,7 +2,7 @@ version: "3.3"
 services:
   influxdb:
     container_name: influxdb
-    image: influxdb:latest
+    image: influxdb:1.8.10
     ports:
       - "8086:8086"
     volumes: 
@@ -10,7 +10,7 @@ services:
     restart: unless-stopped
   grafana:
     container_name: grafana
-    image: grafana/grafana:latest
+    image: grafana/grafana:8.3.3
     depends_on:
       - influxdb
     ports: 
@@ -20,7 +20,7 @@ services:
     restart: unless-stopped
   kelvin:
     container_name: kelvin-hub
-    image: kelvinthermostat/hub:latest
+    image: ghcr.io/kelvinthermostat/hub:latest
     depends_on: 
       - influxdb
     ports:
@@ -31,8 +31,7 @@ services:
     environment:
       - influxdb_host=influxdb
       - influxdb_database=kelvin
-      - sensor_url=http://192.168.68.201
-      - heater_switch_url=http://192.168.68.200
+      - thermostat_url=http://192.168.68.200
 volumes:
   kelvin-hub: 
   kelvin-grafana: 
