@@ -16,14 +16,13 @@ class DashboardWorker():
         thread.start()
 
     def _worker(self):
-        # Delay to only start after other workers
-        self.shuttingdown_event.wait(2)
-
         while not self.shuttingdown_event.is_set():
             try:
+                self.temperature_service.read()
+
                 self.data_service.set_measurements(
                     self.temperature_service.actual_temperature,
-                    self.temperature_service.get_target_temperature(),
+                    self.temperature_service.target_temperature,
                     self.temperature_service.humidity,
                     self.temperature_service.heating)
 
